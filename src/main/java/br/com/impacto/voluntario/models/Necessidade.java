@@ -1,7 +1,7 @@
 package br.com.impacto.voluntario.models;
 
-import br.com.impacto.voluntario.enums.AjudaRequeridaEnum;
 import br.com.impacto.voluntario.enums.DesastreEnum;
+import br.com.impacto.voluntario.enums.HabilidadesEnum;
 import br.com.impacto.voluntario.enums.StatusEnum;
 import br.com.impacto.voluntario.enums.UrgenciaEnum;
 import jakarta.persistence.*;
@@ -14,23 +14,16 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Entity
-@Table(name = "solicitacoes_ajudas")
+@Table(name = "necessidades")
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
 @EqualsAndHashCode(of = "id")
-public class SolicitacaoAjuda {
+public class Necessidade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String nomeSolicitante;
-    private String emailSolicitante;
-    private String telefoneSolicitante;
-    private String descricao;
-    private LocalDate dataEnvio;
-    private Boolean ativo;
-    private LocalDate dataAcontecimento;
-    private Integer pessoasAfetadas;
+    private String titulo;
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "endereco_id")
     private Endereco endereco;
@@ -40,10 +33,12 @@ public class SolicitacaoAjuda {
     private UrgenciaEnum urgencia;
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
-    @ElementCollection(targetClass = AjudaRequeridaEnum.class)
+    private LocalDate dataEnvio;
+    private Boolean ativo;
+    @ElementCollection(targetClass = HabilidadesEnum.class)
     @Enumerated(EnumType.STRING)
-    @CollectionTable(name = "solicitacoes_ajudas_ajuda_requerida", joinColumns = @JoinColumn(name = "solicitacao_id"))
-    @Column(name = "ajuda_requerida")
-    private List<AjudaRequeridaEnum> ajudaRequerida;
-    private String outros;
+    @CollectionTable(name = "necessidade_habilidades", joinColumns = @JoinColumn(name = "necessidade_id"))
+    @Column(name = "habilidade")
+    private List<HabilidadesEnum> habilidadesRequeridas;
+    private String habilidadeOutro;
 }
