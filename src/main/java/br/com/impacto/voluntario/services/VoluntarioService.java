@@ -46,11 +46,20 @@ public class VoluntarioService implements UserDetailsService {
         voluntario.setAtivo(true);
         voluntario.setDataCadastro(LocalDate.now());
         voluntario.setMissoesConcluidas(0);
+        voluntario.setVidasImpactadas(0);
         voluntario.setRole(Roles.USER);
 
         repository.save(voluntario);
 
         return voluntario;
+    }
+
+    @Transactional(readOnly = true)
+    public Voluntario getByEmail(String email) {
+        var voluntario = repository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Voluntario not found with email: " + email));
+
+        return (Voluntario) voluntario;
     }
 
     private Voluntario dtoToEntity(CreateVoluntarioDto dto){
