@@ -13,6 +13,10 @@ import java.util.List;
 public record CreateNecessidadeDto(
         @NotBlank(message = "Titulo é obrigatório")
         String titulo,
+        @NotBlank(message = "Descricao é obrigatória")
+        String descricao,
+        @NotNull(message = "Quantidade de pessoas afetadas é obrigatório")
+        Integer pessoasAfetadas,
         @NotNull(message = "Endereço é obrigatório")
         @Valid
         DtoEndereco endereco,

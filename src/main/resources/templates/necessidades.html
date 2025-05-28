@@ -51,9 +51,14 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
         <div th:each="necessidade : ${necessidades}"
-             class="bg-white rounded-lg shadow-md p-6 border-l-4 hover:shadow-lg transition duration-300 border-red-400">
+            th:classappend="${necessidade.urgencia.descricao == 'Baixa' ? 'border-green-500' :
+                            necessidade.urgencia.descricao == 'Média' ? 'border-blue-500' :
+                            necessidade.urgencia.descricao == 'Alta' ? 'border-yellow-500' :
+                            'border-red-500'}"
+            class="bg-white rounded-lg shadow-md p-6 border-l-4 hover:shadow-lg transition duration-300">
 
-            <h3 class="text-2xl font-semibold text-gray-800 mb-2" th:text="${necessidade.titulo} + ' - ' + ${necessidade.endereco.cidade}"></h3>
+
+            <h3 class="text-2xl font-semibold text-gray-800 mb-2" th:text="${necessidade.titulo} + ' - ' + ${necessidade.endereco.cidade} +'/'+ ${necessidade.endereco.uf}"></h3>
             <p class="text-gray-600 mb-3" th:text="${necessidade.descricao}">Descrição da necessidade</p>
 
             <div class="text-gray-700 text-sm mb-2">
@@ -69,7 +74,12 @@
             </div>
 
             <div class="text-gray-700 text-sm mb-4">
-                <span class="font-semibold">Urgência:</span> <span th:text="${necessidade.urgencia.descricao}"></span>
+                <span class="font-semibold">Urgência:</span>
+                <span class="font-bold" th:text="${necessidade.urgencia}"
+                      th:classappend="${necessidade.urgencia.descricao == 'Baixa' ? 'text-green-600' :
+                          necessidade.urgencia.descricao == 'Média' ? 'text-blue-600' :
+                          necessidade.urgencia.descricao == 'Alta' ? 'text-yellow-600' :
+                          'text-red-600'}"> </span>
             </div>
             <button class="bg-blue-600 text-white px-6 py-2 rounded-full hover:bg-blue-700 transition duration-300">Quero Ajudar</button>
         </div>
