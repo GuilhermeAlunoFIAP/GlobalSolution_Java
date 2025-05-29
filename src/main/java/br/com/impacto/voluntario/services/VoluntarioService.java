@@ -11,6 +11,7 @@ import br.com.impacto.voluntario.models.Voluntario;
 import br.com.impacto.voluntario.repositories.EnderecoRepository;
 import br.com.impacto.voluntario.repositories.VoluntarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -31,6 +32,10 @@ public class VoluntarioService implements UserDetailsService {
     private EnderecoRepository enderecoRepository;
 
     @Autowired
+    @Lazy
+    private NecessidadeService necessidadeService;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Transactional
@@ -49,11 +54,25 @@ public class VoluntarioService implements UserDetailsService {
         voluntario.setDataCadastro(LocalDate.now());
         voluntario.setMissoesConcluidas(0);
         voluntario.setVidasImpactadas(0);
-        voluntario.setRole(Roles.ADMIN);
+        voluntario.setRole(Roles.USER);
 
-        repository.save(voluntario);
+        this.save(voluntario);
 
         return voluntario;
+    }
+
+    @Transactional
+    public void queroAjudar(String email, Long necessidadeId) {
+        var voluntario = this.getByEmail(email);
+        var necessidade = necessidadeService.findById(necessidadeId);
+
+        if (!voluntario.getNecessidades().contains(necessidade)) {
+            voluntario.getNecessidades().add(necessidade);
+            necessidade.getVoluntarios().add(voluntario);
+            necessidade.setQtdVoluntarios(necessidade.getVoluntarios().size());
+            this.save(voluntario);
+            necessidadeService.save(necessidade);
+        }
     }
 
     @Transactional(readOnly = true)
@@ -62,6 +81,11 @@ public class VoluntarioService implements UserDetailsService {
                 .orElseThrow(() -> new ObjectNotFoundException("Voluntario with email \""+email+"\" not found"));
 
         return (Voluntario) voluntario;
+    }
+
+    @Transactional
+    public void save(Voluntario voluntario){
+        repository.save(voluntario);
     }
 
     private Voluntario dtoToEntity(CreateVoluntarioDto dto){

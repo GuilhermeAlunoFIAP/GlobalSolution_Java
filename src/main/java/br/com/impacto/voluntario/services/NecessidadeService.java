@@ -22,6 +22,9 @@ public class NecessidadeService {
     private NecessidadeRepository repository;
 
     @Autowired
+    private VoluntarioService voluntarioService;
+
+    @Autowired
     private EnderecoRepository enderecoRepository;
 
     @Transactional
@@ -34,7 +37,7 @@ public class NecessidadeService {
         necessidade.setDataEnvio(LocalDate.now());
         necessidade.setAtivo(true);
 
-        repository.save(necessidade);
+        this.save(necessidade);
 
         return necessidade;
     }
@@ -48,15 +51,33 @@ public class NecessidadeService {
     public void excluir(Long id) {
         var necessidade = this.findById(id);
         necessidade.setAtivo(false);
-        repository.save(necessidade);
+        this.save(necessidade);
     }
 
     @Transactional
-    private Necessidade findById(Long id){
+    public void finalizar(Long id) {
+        var necessidade = this.findById(id);
+        necessidade.setStatus(StatusEnum.FINALIZADO);
+        necessidade.setAtivo(false);
+        necessidade.getVoluntarios().forEach(v -> {
+            v.setMissoesConcluidas(v.getMissoesConcluidas() + 1);
+            v.setVidasImpactadas(v.getVidasImpactadas() + necessidade.getPessoasAfetadas());
+            voluntarioService.save(v);
+        });
+        this.save(necessidade);
+    }
+
+    @Transactional
+    public Necessidade findById(Long id){
         if (!repository.existsById(id))
             throw new ObjectNotFoundException("Necessidade with id: "+id+" not found");
 
         return repository.getReferenceById(id);
+    }
+
+    @Transactional
+    public void save(Necessidade necessidade){
+        repository.save(necessidade);
     }
 
     private Necessidade dtoToEntity(CreateNecessidadeDto dto){
