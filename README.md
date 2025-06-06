@@ -15,6 +15,7 @@ Nosso projeto consiste em uma API desenvolvida em Java utilizando o framework Sp
 - **JPA / Hibernate**
 - **Thymeleaf**
 - **Banco de Dados**
+- - **Azure**
 - **Maven**
 
 ### Sumário
